@@ -1,41 +1,48 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Dicoding Story App - Share your stories">
+    <meta name="theme-color" content="#2563eb">
+    <meta name="description" content="Share your stories with the world">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="apple-touch-icon" href="/images/icon-192x192.png">
     <title>Dicoding Story App</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 </head>
 <body>
-    <a href="#main-content" class="skip-link">Skip to main content</a>
+    <a href="#main-content" class="skip-link">Skip to content</a>
     
-    <header>
-        <nav class="navbar" role="navigation" aria-label="Main navigation">
-            <div class="container">
-                <div class="nav-brand">
-                    <img src="images/logo.png" alt="Dicoding Story Logo" class="logo">
-                    <h1>Dicoding Story</h1>
-                </div>
-                <ul class="nav-links" id="nav-links">
-                    <li><a href="#/">Home</a></li>
-                    <li><a href="#/add-story" id="add-story-link" class="hidden">Add Story</a></li>
-                    <li><a href="#/login" id="login-link">Login</a></li>
-                    <li><a href="#/register" id="register-link">Register</a></li>
-                    <li><button id="logout-button" class="hidden">Logout</button></li>
-                </ul>
-            </div>
+    <header class="app-bar">
+        <div class="app-bar__menu">
+            <button id="hamburgerButton">☰</button>
+        </div>
+        <div class="app-bar__brand">
+            <h1>Dicoding Stories</h1>
+        </div>
+        <nav id="navigationDrawer" class="app-bar__navigation">
+            <ul>
+                <li><a href="#/">Home</a></li>
+                <li>
+                    <button id="notificationButton" class="notification-button" aria-label="Notifications">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-badge" id="notificationBadge" style="display: none;">0</span>
+                    </button>
+                </li>
+                <li><a href="#/add-story">Add Story</a></li>
+                <li><a href="#/login" id="loginMenu">Login</a></li>
+                <li><a href="#/register" id="registerMenu">Register</a></li>
+                <li><a href="#" id="logoutMenu" style="display: none;">Logout</a></li>
+            </ul>
         </nav>
     </header>
 
-    <main id="main-content" role="main">
-        <div id="app" class="container"></div>
+    <main id="main-content">
+        <div id="app"></div>
     </main>
 
-    <footer role="contentinfo">
-        <div class="container">
-            <p>Yongky - FC012D5Y2408</p>
-        </div>
+    <footer>
+        <p>Dicoding Story App &copy; 2024</p>
     </footer>
 </body>
 </html>

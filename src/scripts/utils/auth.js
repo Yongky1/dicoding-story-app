@@ -1,32 +1,38 @@
+import { unsubscribePushNotification } from './pushNotification';
+
 const checkAuth = () => {
     const token = localStorage.getItem('token');
     return !!token;
   };
   
   const updateNavigation = () => {
-    const isAuthenticated = checkAuth();
+    const isLoggedIn = checkAuth();
     
-    const loginLink = document.getElementById('login-link');
-    const registerLink = document.getElementById('register-link');
-    const logoutButton = document.getElementById('logout-button');
-    const addStoryLink = document.getElementById('add-story-link');
+    const loginMenu = document.getElementById('loginMenu');
+    const registerMenu = document.getElementById('registerMenu');
+    const logoutMenu = document.getElementById('logoutMenu');
+    const addStoryLink = document.querySelector('a[href="#/add-story"]');
     
-    if (isAuthenticated) {
-      loginLink.classList.add('hidden');
-      registerLink.classList.add('hidden');
-      logoutButton.classList.remove('hidden');
-      addStoryLink.classList.remove('hidden');
-      
-      logoutButton.addEventListener('click', logout);
+    if (isLoggedIn) {
+      loginMenu.style.display = 'none';
+      registerMenu.style.display = 'none';
+      logoutMenu.style.display = 'block';
+      if (addStoryLink) addStoryLink.style.display = 'block';
     } else {
-      loginLink.classList.remove('hidden');
-      registerLink.classList.remove('hidden');
-      logoutButton.classList.add('hidden');
-      addStoryLink.classList.add('hidden');
+      loginMenu.style.display = 'block';
+      registerMenu.style.display = 'block';
+      logoutMenu.style.display = 'none';
+      if (addStoryLink) addStoryLink.style.display = 'none';
     }
   };
   
-  const logout = () => {
+  const logout = async () => {
+    try {
+      await unsubscribePushNotification();
+    } catch (error) {
+      console.error('Failed to unsubscribe push notification:', error);
+    }
+    
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     

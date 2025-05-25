@@ -28,7 +28,9 @@ module.exports = {
     }),
     new CopyWebpackPlugin({
       patterns: [
-        { from: 'public', to: '' }
+        { from: 'public', to: '' },
+        { from: 'public/service-worker.js', to: 'service-worker.js' },
+        { from: 'public/manifest.json', to: 'manifest.json' }
       ]
     })
   ],
