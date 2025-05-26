@@ -27,10 +27,14 @@ class AddStoryPage {
     applyCustomTransition('slide');
     const container = document.getElementById('app');
     container.innerHTML = `
-      <section class="add-story-section">
-        <h2><i class="fas fa-edit"></i> Add New Story</h2>
-        ${this.view.render()}
-      </section>
+      <div class="container">
+        <section class="add-story-section">
+          <div class="form-container">
+            <h2><i class="fas fa-edit"></i> Add New Story</h2>
+            ${this.view.render()}
+          </div>
+        </section>
+      </div>
     `;
     await Promise.resolve();
     this.presenter = new StoryPresenter(this.view);
