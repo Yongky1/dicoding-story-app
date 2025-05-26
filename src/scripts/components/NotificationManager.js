@@ -2,7 +2,6 @@ class NotificationManager {
   constructor() {
     this.notifications = [];
     this.unreadCount = 0;
-    this.init();
   }
 
   init() {
@@ -14,6 +13,7 @@ class NotificationManager {
 
     // Add click event to notification button
     const button = document.getElementById('notificationButton');
+    if (!button) return; // Jangan error jika button tidak ada
     button.addEventListener('click', () => this.toggleDropdown());
 
     // Close dropdown when clicking outside

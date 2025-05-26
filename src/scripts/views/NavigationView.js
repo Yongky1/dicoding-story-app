@@ -10,15 +10,13 @@ class NavigationView {
   render() {
     return `
       <nav class="navbar">
-        <div class="navbar-brand">
-          <a href="#/" class="navbar-item">
-            <i class="fas fa-book-open"></i> Story App
-          </a>
-        </div>
-        
         <div class="navbar-menu">
           ${this.isLoggedIn ? `
-            <a href="#/" class="navbar-item">
+            <button id="notificationButton" class="notification-button navbar-item" aria-label="Notifications">
+              <i class="fas fa-bell"></i>
+              <span class="notification-badge" id="notificationBadge" style="display: none;">0</span>
+            </button>
+            <a href="#/" class="navbar-item" id="home-button">
               <i class="fas fa-home"></i> Home
             </a>
             <a href="#/add-story" class="navbar-item">

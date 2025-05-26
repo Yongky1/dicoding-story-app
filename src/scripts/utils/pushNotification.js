@@ -29,83 +29,55 @@ const registerServiceWorker = async () => {
   throw new Error('ServiceWorker not supported');
 };
 
-const subscribePushNotification = async (registration) => {
-  try {
-    const subscription = await registration.pushManager.subscribe({
-      userVisibleOnly: true,
-      applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
-    });
+// Fungsi untuk subscribe push notification ke server Dicoding
+const subscribePushNotification = async (token = localStorage.getItem('token')) => {
+  const registration = await navigator.serviceWorker.ready;
+  const subscription = await registration.pushManager.subscribe({
+    userVisibleOnly: true,
+    applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
+  });
+  const { endpoint, keys } = subscription.toJSON();
+  const response = await fetch('https://story-api.dicoding.dev/v1/notifications/subscribe', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+    body: JSON.stringify({ endpoint, keys })
+  });
+  if (!response.ok) throw new Error('Failed to subscribe push notification');
+  return subscription;
+};
 
-    // Kirim subscription ke server
+// Fungsi untuk unsubscribe push notification dari server Dicoding
+const unsubscribePushNotification = async (token = localStorage.getItem('token')) => {
+  const registration = await navigator.serviceWorker.ready;
+  const subscription = await registration.pushManager.getSubscription();
+  if (subscription) {
+    const { endpoint } = subscription;
+    // Hapus dari server
     const response = await fetch('https://story-api.dicoding.dev/v1/notifications/subscribe', {
-      method: 'POST',
+      method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
+        'Authorization': `Bearer ${token}`
       },
-      body: JSON.stringify({
-        endpoint: subscription.endpoint,
-        keys: {
-          p256dh: btoa(String.fromCharCode.apply(null, 
-            new Uint8Array(subscription.getKey('p256dh')))),
-          auth: btoa(String.fromCharCode.apply(null, 
-            new Uint8Array(subscription.getKey('auth'))))
-        }
-      })
+      body: JSON.stringify({ endpoint })
     });
-
-    if (!response.ok) {
-      throw new Error('Failed to subscribe push notification');
-    }
-
-    return subscription;
-  } catch (error) {
-    console.error('Failed to subscribe push notification:', error);
-    throw error;
+    if (!response.ok) throw new Error('Failed to unsubscribe push notification');
+    await subscription.unsubscribe();
   }
 };
 
-const unsubscribePushNotification = async () => {
-  try {
-    const registration = await navigator.serviceWorker.ready;
-    const subscription = await registration.pushManager.getSubscription();
-    
-    if (subscription) {
-      // Unsubscribe dari push service
-      await subscription.unsubscribe();
-      
-      // Hapus subscription dari server
-      const response = await fetch('https://story-api.dicoding.dev/v1/notifications/subscribe', {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
-        body: JSON.stringify({
-          endpoint: subscription.endpoint
-        })
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to unsubscribe push notification');
-      }
-
-      console.log('Successfully unsubscribed from push notification');
-    }
-  } catch (error) {
-    console.error('Failed to unsubscribe push notification:', error);
-    throw error;
-  }
-};
-
+// Inisialisasi service worker saja (tanpa auto subscribe)
 const initPushNotification = async () => {
   try {
-    const registration = await registerServiceWorker();
-    await subscribePushNotification(registration);
-    console.log('Push notification initialized successfully');
+    await registerServiceWorker();
+    // Tidak auto subscribe di sini, biar manual oleh user
+    console.log('Service worker registered for push notification');
   } catch (error) {
     console.error('Failed to initialize push notification:', error);
   }
 };
 
-export { initPushNotification, unsubscribePushNotification }; 
+export { initPushNotification, subscribePushNotification, unsubscribePushNotification }; 

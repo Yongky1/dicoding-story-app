@@ -68,13 +68,14 @@ body {
   height: 40px;
 }
 
-.nav-links {
+.navbar-menu {
   display: flex;
-  list-style: none;
+  flex-direction: row;
+  align-items: center;
   gap: 20px;
 }
 
-.nav-links a, .nav-links button {
+.navbar-menu .navbar-item, .navbar-menu .notification-button {
   color: white;
   text-decoration: none;
   padding: 8px 16px;
@@ -84,9 +85,11 @@ body {
   border: none;
   cursor: pointer;
   font-size: 16px;
+  display: flex;
+  align-items: center;
 }
 
-.nav-links a:hover, .nav-links button:hover {
+.navbar-menu .navbar-item:hover, .navbar-menu .notification-button:hover {
   background-color: rgba(255,255,255,0.1);
 }
 
