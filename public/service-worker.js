@@ -82,9 +82,10 @@ self.addEventListener('fetch', (event) => {
             return response;
           })
           .catch(() => {
-            // If network fails and request is for a page, return offline page
+            // Perbaikan di sini:
             if (event.request.mode === 'navigate') {
-              return caches.match('/offline.html');
+              // Kembalikan index.html agar SPA tetap jalan offline
+              return caches.match('/index.html');
             }
             // If network fails and request is for an image, return null
             if (event.request.destination === 'image') {

@@ -23,6 +23,9 @@ class NavigationView {
             <a href="#/add-story" class="navbar-item">
               <i class="fas fa-plus"></i> Add Story
             </a>
+            <a href="#/saved-stories" class="navbar-item">
+              <i class="fas fa-save"></i> Saved Stories
+            </a>
             <button id="logout-button" class="navbar-item" type="button">
               <i class="fas fa-sign-out-alt"></i> Logout
             </button>
