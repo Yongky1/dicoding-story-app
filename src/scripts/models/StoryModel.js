@@ -8,6 +8,12 @@ class StoryModel {
   async getAllStories() {
     try {
       const response = await fetch('https://story-api.dicoding.dev/v1/stories');
+      if (!response.ok) {
+        if (response.status === 503) {
+          throw new Error('Anda sedang offline, data tidak dapat dimuat.');
+        }
+        throw new Error('Gagal mengambil data stories');
+      }
       const responseJson = await response.json();
       if (!responseJson.error) {
         this._stories = responseJson.listStory;

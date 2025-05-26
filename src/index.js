@@ -9,9 +9,9 @@ import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
 
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
-  iconUrl: markerIcon,
-  iconRetinaUrl: markerIcon2x,
-  shadowUrl: markerShadow,
+  iconUrl: './images/marker-icon.png',
+  iconRetinaUrl: './images/marker-icon-2x.png',
+  shadowUrl: './images/marker-shadow.png',
 });
 
 import App from './scripts/app';
@@ -32,5 +32,16 @@ document.addEventListener('DOMContentLoaded', () => {
       mainContent.scrollIntoView();
       setTimeout(() => mainContent.removeAttribute('tabindex'), 1000); // Clean up
     });
+  }
+
+  // Unregister service worker otomatis di development
+  if ('serviceWorker' in navigator) {
+    if (process.env.NODE_ENV !== 'production') {
+      navigator.serviceWorker.getRegistrations().then(function(registrations) {
+        for (let registration of registrations) {
+          registration.unregister();
+        }
+      });
+    }
   }
 });

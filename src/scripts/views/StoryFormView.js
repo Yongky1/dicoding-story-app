@@ -9,79 +9,87 @@ class StoryFormView {
 
   render() {
     return `
-      <form id="story-form" class="story-form">
-        <div class="form-group">
-          <label for="description">Description</label>
-          <textarea id="description" name="description" required placeholder="Write your story here..."></textarea>
-        </div>
-
-        <div class="form-group">
-          <div class="photo-options">
-            <div class="option-tabs">
-              <button type="button" id="file-option-btn" class="option-tab active">
-                <i class="fas fa-file-upload"></i> Upload File
-              </button>
-              <button type="button" id="camera-option-btn" class="option-tab">
-                <i class="fas fa-camera"></i> Use Camera
-              </button>
+      <section class="add-story-header">
+        <h1 class="add-story-title"><i class="fas fa-edit"></i> Add New Story</h1>
+        <p class="add-story-desc">Share your experience with the Dicoding community</p>
+      </section>
+      <section class="add-story-main">
+        <div class="form-container">
+          <form id="story-form" class="story-form">
+            <div class="form-group">
+              <label for="description">Description</label>
+              <textarea id="description" name="description" required placeholder="Write your story here..."></textarea>
             </div>
 
-            <div id="file-upload-container" class="photo-option-container">
-              <div class="file-upload-wrapper">
-                <input type="file" id="photo-file" accept="image/*" class="file-input">
-                <label for="photo-file" class="file-label">
-                  <i class="fas fa-cloud-upload-alt"></i>
-                  <span id="file-name">Choose image file (max 1MB)</span>
-                </label>
-              </div>
-              <div id="file-preview-container" class="file-preview-container hidden">
-                <img id="file-preview" class="file-preview">
-                <button type="button" id="remove-file" class="btn btn-secondary">
-                  <i class="fas fa-trash"></i> Remove
-                </button>
-              </div>
-              <div id="file-status" class="file-status" aria-live="polite"></div>
-            </div>
-
-            <div id="camera-container" class="photo-option-container hidden">
-              <div id="photo-section" class="camera-container">
-                <video id="video-preview" autoplay playsinline class="camera-preview"></video>
-                <canvas id="camera-canvas" class="camera-preview hidden"></canvas>
-                <img id="camera-preview" class="camera-preview hidden">
-                <div class="camera-controls">
-                  <button type="button" id="start-camera" class="btn btn-secondary">
-                    <i class="fas fa-camera"></i> Start Camera
+            <div class="form-group">
+              <div class="photo-options">
+                <div class="option-tabs">
+                  <button type="button" id="file-option-btn" class="option-tab active">
+                    <i class="fas fa-file-upload"></i> Upload File
                   </button>
-                  <button type="button" id="capture-photo" class="btn btn-primary hidden">
-                    <i class="fas fa-camera"></i> Capture Photo
-                  </button>
-                  <button type="button" id="retake-photo" class="btn btn-secondary hidden">
-                    <i class="fas fa-redo"></i> Retake
-                  </button>
-                  <button type="button" id="switch-camera" class="btn btn-secondary hidden">
-                    <i class="fas fa-sync"></i> Switch Camera
+                  <button type="button" id="camera-option-btn" class="option-tab">
+                    <i class="fas fa-camera"></i> Use Camera
                   </button>
                 </div>
-                <div id="camera-status" class="camera-status" aria-live="polite"></div>
+
+                <div id="file-upload-container" class="photo-option-container">
+                  <div class="file-upload-wrapper">
+                    <input type="file" id="photo-file" accept="image/*" class="file-input">
+                    <label for="photo-file" class="file-label">
+                      <i class="fas fa-cloud-upload-alt"></i>
+                      <span id="file-name">Choose image file (max 1MB)</span>
+                    </label>
+                  </div>
+                  <div id="file-preview-container" class="file-preview-container hidden">
+                    <img id="file-preview" class="file-preview">
+                    <button type="button" id="remove-file" class="btn btn-secondary">
+                      <i class="fas fa-trash"></i> Remove
+                    </button>
+                  </div>
+                  <div id="file-status" class="file-status" aria-live="polite"></div>
+                </div>
+
+                <div id="camera-container" class="photo-option-container hidden">
+                  <div id="photo-section" class="camera-container">
+                    <video id="video-preview" autoplay playsinline class="camera-preview"></video>
+                    <canvas id="camera-canvas" class="camera-preview hidden"></canvas>
+                    <img id="camera-preview" class="camera-preview hidden">
+                    <div class="camera-controls">
+                      <button type="button" id="start-camera" class="btn btn-secondary">
+                        <i class="fas fa-camera"></i> Start Camera
+                      </button>
+                      <button type="button" id="capture-photo" class="btn btn-primary hidden">
+                        <i class="fas fa-camera"></i> Capture Photo
+                      </button>
+                      <button type="button" id="retake-photo" class="btn btn-secondary hidden">
+                        <i class="fas fa-redo"></i> Retake
+                      </button>
+                      <button type="button" id="switch-camera" class="btn btn-secondary hidden">
+                        <i class="fas fa-sync"></i> Switch Camera
+                      </button>
+                    </div>
+                    <div id="camera-status" class="camera-status" aria-live="polite"></div>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-        </div>
 
-        <div class="form-group">
-          <label for="location-map">Location (click on map)</label>
-          <div id="location-map" class="map-container" aria-describedby="map-help"></div>
-          <small id="map-help">Click on the map to set your story location</small>
-          <div id="location-info" class="location-info" aria-live="polite"></div>
-          <input type="hidden" id="lat" name="lat" required />
-          <input type="hidden" id="lon" name="lon" required />
-        </div>
+            <div class="form-group">
+              <label for="location-map">Location (click on map)</label>
+              <div id="location-map" class="map-container" aria-describedby="map-help"></div>
+              <small id="map-help">Click on the map to set your story location</small>
+              <div id="location-info" class="location-info" aria-live="polite"></div>
+              <input type="hidden" id="lat" name="lat" required />
+              <input type="hidden" id="lon" name="lon" required />
+            </div>
 
-        <button type="submit" class="btn btn-primary submit-btn">
-          <i class="fas fa-paper-plane"></i> Submit Story
-        </button>
-      </form>
-      <div id="form-message"></div>
+            <button type="submit" class="btn btn-primary submit-btn">
+              <i class="fas fa-paper-plane"></i> Submit Story
+            </button>
+          </form>
+          <div id="form-message"></div>
+        </div>
+      </section>
     `;
   }
 

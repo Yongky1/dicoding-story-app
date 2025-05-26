@@ -4,6 +4,7 @@ import { initViewTransitions } from './utils/transitions';
 import { initPushNotification } from './utils/pushNotification';
 import NotificationManager from './components/NotificationManager';
 import NavigationView from './views/NavigationView';
+import offlineIndicator from './utils/offlineIndicator';
 
 class App {
   constructor() {
@@ -15,14 +16,29 @@ class App {
 
   renderNavigationBar() {
     const navDrawer = document.getElementById('navigationDrawer');
+    if (!navDrawer) return;
+
+    // Cleanup existing navigation
+    this.navigationView.destroy();
+    
+    // Update login status and render
     this.navigationView.setLoggedIn(checkAuth());
     navDrawer.innerHTML = this.navigationView.render();
+    
+    // Bind logout handler if user is logged in
     if (checkAuth()) {
       this.navigationView.bindLogout(async (e) => {
         e.preventDefault();
-        await logout();
+        console.log('Logout button clicked');
+        try {
+          await logout();
+        } catch (error) {
+          console.error('Logout failed:', error);
+        }
       });
     }
+    
+    // Initialize notification manager
     setTimeout(() => {
       this.notificationManager.init();
     }, 0);
@@ -44,12 +60,22 @@ class App {
       this.renderNavigationBar();
     };
 
+    // Initial render
     this.renderNavigationBar();
 
+    // Event listeners
     window.addEventListener('hashchange', handleAndUpdate);
     window.addEventListener('load', handleAndUpdate);
     window.addEventListener('auth-change', () => {
+      console.log('[App] auth-change event triggered');
       this.renderNavigationBar();
+      // After logout, if not logged in, force to login page
+      if (!checkAuth()) {
+        window.location.hash = '/login';
+        console.log('[App] Force hash to /login');
+        this.router.handleRoute(); // Paksa router untuk render login
+        console.log('[App] router.handleRoute() dipanggil');
+      }
     });
   }
 }

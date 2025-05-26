@@ -1,6 +1,7 @@
 class NavigationView {
   constructor() {
     this.isLoggedIn = false;
+    this.logoutHandler = null;
   }
 
   setLoggedIn(status) {
@@ -22,7 +23,7 @@ class NavigationView {
             <a href="#/add-story" class="navbar-item">
               <i class="fas fa-plus"></i> Add Story
             </a>
-            <button id="logout-button" class="navbar-item">
+            <button id="logout-button" class="navbar-item" type="button">
               <i class="fas fa-sign-out-alt"></i> Logout
             </button>
           ` : `
@@ -39,9 +40,33 @@ class NavigationView {
   }
 
   bindLogout(handler) {
+    // Remove existing event listener if any
+    this.destroy();
+
+    // Store the new handler
+    this.logoutHandler = handler;
+
+    // Add new event listener
     const logoutButton = document.getElementById('logout-button');
     if (logoutButton) {
-      logoutButton.addEventListener('click', handler);
+      logoutButton.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        this.logoutHandler(e);
+      });
+    } else {
+      console.warn('Logout button not found!');
+    }
+  }
+
+  destroy() {
+    // Cleanup event listeners
+    if (this.logoutHandler) {
+      const logoutButton = document.getElementById('logout-button');
+      if (logoutButton) {
+        logoutButton.removeEventListener('click', this.logoutHandler);
+      }
+      this.logoutHandler = null;
     }
   }
 }

@@ -78,23 +78,41 @@ class StoryPresenter {
       if (!this._camera) {
         this._camera = new Camera('video-preview');
       }
-      await this._camera.start();
+      const videoElement = await this._camera.start();
+      if (!videoElement) {
+        throw new Error('Failed to start camera');
+      }
       this._isCameraActive = true;
       this._view.setCamera(this._camera);
       this._view.updateCameraPreview();
+      return true;
     } catch (error) {
       this._view.showError('Failed to start camera: ' + error.message);
+      return false;
     }
   }
 
   async handleCapture() {
     try {
-      if (!this._camera) {
+      if (!this._camera || !this._isCameraActive) {
         this._view.showError('Camera is not initialized. Please start the camera first.');
         return;
       }
       await this._camera.captureImage();
       this._view.updateCameraPreview();
+      
+      // Stop camera after capturing
+      this._camera.stop();
+      this._isCameraActive = false;
+      
+      // Update UI to show captured image
+      const videoElement = document.getElementById('video-preview');
+      const cameraPreviewImg = document.getElementById('camera-preview');
+      if (videoElement) videoElement.classList.add('hidden');
+      if (cameraPreviewImg) {
+        cameraPreviewImg.src = this._camera.getCapturedImage();
+        cameraPreviewImg.classList.remove('hidden');
+      }
     } catch (error) {
       this._view.showError('Failed to capture photo: ' + error.message);
     }

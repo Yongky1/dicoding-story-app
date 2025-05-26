@@ -12,17 +12,29 @@ const updateNavigation = () => {
 
 const logout = async () => {
     const token = localStorage.getItem('token');
-    if (token) {
-      try {
-        await unsubscribePushNotification(token);
-      } catch (error) {
-        console.error('Failed to unsubscribe push notification:', error);
-      }
-    }
+    console.log('[Logout] Token sebelum logout:', token);
+    
+    // Clear localStorage first
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    console.log('[Logout] Token dan user dihapus dari localStorage');
+
+    if (token) {
+        try {
+            await unsubscribePushNotification(token);
+            console.log('[Logout] Unsubscribe push notification sukses');
+        } catch (error) {
+            console.error('[Logout] Failed to unsubscribe push notification:', error);
+        }
+    }
+
+    // Dispatch auth-change event
     window.dispatchEvent(new Event('auth-change'));
-    window.location.hash = '/';
+    console.log('[Logout] Event auth-change dipanggil');
+
+    // Force navigation to login page
+    window.location.replace('#/login');
+    console.log('[Logout] Hash diubah ke /login');
 };
 
 export { checkAuth, updateNavigation, logout };

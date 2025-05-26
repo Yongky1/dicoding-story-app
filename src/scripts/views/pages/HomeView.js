@@ -3,10 +3,14 @@ class HomeView {
     const app = document.getElementById('app');
     if (app) {
       app.innerHTML = `
-        <section class="stories-section">
-          <h2><i class="fas fa-book-open"></i> Dicoding Stories</h2>
-          <p class="stories-intro">Explore stories shared by the Dicoding community</p>
-          <div id="stories-map" class="map-container" aria-label="Map showing story locations"></div>
+        <section class="home-header">
+          <h1 class="home-title"><i class="fas fa-book-open"></i> Dicoding Stories</h1>
+          <p class="home-desc">Explore stories shared by the Dicoding community</p>
+        </section>
+        <section class="home-main">
+          <div class="map-card">
+            <div id="stories-map" class="map-container" aria-label="Map showing story locations"></div>
+          </div>
           <div class="story-grid" id="story-grid" role="feed" aria-label="Story feed"></div>
         </section>
       `;

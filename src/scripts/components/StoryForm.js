@@ -252,6 +252,10 @@ class StoryForm {
         cameraPreviewImg.src = imageData;
         cameraPreviewImg.classList.remove('hidden');
         videoElement.classList.add('hidden');
+        
+        // Stop the camera after capturing
+        this.camera.stop();
+        
         const filePreviewContainer = document.getElementById('file-preview-container');
         const filePreview = document.getElementById('file-preview');
         const fileStatus = document.getElementById('file-status');
@@ -274,6 +278,8 @@ class StoryForm {
       cameraStatus.textContent = 'Restarting camera...';
       try {
         this.camera.clearCapturedImage();
+        // Ensure camera is stopped before restarting
+        this.camera.stop();
         await this.camera.start();
         this.photoFile = null;
         captureButton.classList.remove('hidden');
