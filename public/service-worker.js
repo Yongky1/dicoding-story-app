@@ -82,23 +82,23 @@ self.addEventListener('fetch', (event) => {
             return response;
           })
           .catch(() => {
-            // Perbaikan di sini:
+            // Handle navigation requests
             if (event.request.mode === 'navigate') {
-              // Kembalikan index.html agar SPA tetap jalan offline
+              // Return index.html for all navigation requests
+              // This ensures SPA routing works offline
               return caches.match('/index.html');
             }
-            // If network fails and request is for an image, return null
+            
+            // Handle image requests
             if (event.request.destination === 'image') {
               return new Response('', {
                 status: 404,
                 statusText: 'Not Found'
               });
             }
-            // For other requests, return a basic offline response
-            return new Response('Offline', {
-              status: 503,
-              statusText: 'Service Unavailable'
-            });
+            
+            // For other requests, return offline page
+            return caches.match('/offline.html');
           });
       })
   );

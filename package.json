@@ -1,5 +1,5 @@
 {
-  "name": "dicoding-story-appv3",
+  "name": "dicoding-story-app",
   "version": "1.0.0",
   "description": "Dicoding Story App with SPA Architecture",
   "private": true,
@@ -17,12 +17,17 @@
     "style-loader": "^3.3.3",
     "webpack": "^5.88.2",
     "webpack-cli": "^5.1.4",
-    "webpack-dev-server": "^4.15.1"
+    "webpack-dev-server": "^4.15.1",
+    "workbox-cacheable-response": "^7.3.0",
+    "workbox-core": "^7.3.0",
+    "workbox-expiration": "^7.3.0",
+    "workbox-precaching": "^7.3.0",
+    "workbox-routing": "^7.3.0",
+    "workbox-strategies": "^7.3.0",
+    "workbox-webpack-plugin": "^7.3.0"
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^6.4.2",
-    "dicoding-story-appv3": "file:",
-    "graceful-fs": "^4.2.11",
     "leaflet": "^1.9.4"
   }
 }

@@ -14,18 +14,27 @@ class AddStoryPage {
   }
 
   async render() {
-    if (this.mapComponent) {
-      this.mapComponent.destroy();
-      this.mapComponent = null;
-    }
-    const mapDiv = document.getElementById('location-map');
-    if (mapDiv) mapDiv.innerHTML = '';
     if (!checkAuth()) {
       window.location.hash = '/login';
       return;
     }
+
+    if (this.mapComponent) {
+      this.mapComponent.destroy();
+      this.mapComponent = null;
+    }
+
+    const mapDiv = document.getElementById('location-map');
+    if (mapDiv) mapDiv.innerHTML = '';
+
     applyCustomTransition('slide');
+    
     const container = document.getElementById('app');
+    if (!container) {
+      console.error('Element #app not found');
+      return;
+    }
+
     container.innerHTML = `
       <div class="container">
         <section class="add-story-section">
@@ -36,19 +45,42 @@ class AddStoryPage {
         </section>
       </div>
     `;
-    await Promise.resolve();
-    this.presenter = new StoryPresenter(this.view);
-    await this.presenter.init();
-    this.mapComponent = new MapComponent();
-    this.mapComponent.init('location-map');
-    this.mapComponent.onLocationSelect((lat, lng) => this.handleLocationSelect(lat, lng));
-    if (this.view.setCameraInitCallback) {
-      this.view.setCameraInitCallback(() => this.presenter.initializeCamera());
+
+    try {
+      await Promise.resolve();
+      this.presenter = new StoryPresenter(this.view);
+      await this.presenter.init();
+      
+      this.mapComponent = new MapComponent();
+      this.mapComponent.init('location-map');
+      this.mapComponent.onLocationSelect((lat, lng) => this.handleLocationSelect(lat, lng));
+      
+      if (this.view.setCameraInitCallback) {
+        this.view.setCameraInitCallback(() => this.presenter.initializeCamera());
+      }
+      
+      if (this.view.initializeTabSwitching) this.view.initializeTabSwitching();
+      if (this.view.initializeFileUpload) this.view.initializeFileUpload();
+      
+      this.initializeFormHandlers();
+      await this.presenter._getCurrentLocation();
+    } catch (error) {
+      console.error('Error initializing AddStoryPage:', error);
+      container.innerHTML = `
+        <div class="error-container" style="text-align: center; padding: 2rem;">
+          <h2>Error</h2>
+          <p>${error.message}</p>
+          <button onclick="window.location.hash = '/'" style="
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.25rem;
+            cursor: pointer;
+          ">Kembali ke Beranda</button>
+        </div>
+      `;
     }
-    if (this.view.initializeTabSwitching) this.view.initializeTabSwitching();
-    if (this.view.initializeFileUpload) this.view.initializeFileUpload();
-    this.initializeFormHandlers();
-    await this.presenter._getCurrentLocation();
   }
 
   initializeFormHandlers() {

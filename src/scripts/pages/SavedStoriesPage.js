@@ -3,6 +3,11 @@ import { getSavedStories, deleteSavedStory, clearSavedStories } from '../utils/s
 export default class SavedStoriesPage {
   async render() {
     const app = document.getElementById('app');
+    if (!app) {
+      console.error('Element #app not found');
+      return;
+    }
+    
     app.innerHTML = `
       <section>
         <h2><i class="fas fa-save"></i> Saved Stories (Offline)</h2>
@@ -10,20 +15,31 @@ export default class SavedStoriesPage {
         <div id="saved-stories-list"></div>
       </section>
     `;
-    this.showSavedStories();
-    document.getElementById('clear-all-saved').onclick = async () => {
-      await clearSavedStories();
-      this.showSavedStories();
-    };
+    
+    await this.showSavedStories();
+    
+    const clearButton = document.getElementById('clear-all-saved');
+    if (clearButton) {
+      clearButton.onclick = async () => {
+        await clearSavedStories();
+        await this.showSavedStories();
+      };
+    }
   }
 
   async showSavedStories() {
     const stories = await getSavedStories();
     const list = document.getElementById('saved-stories-list');
+    if (!list) {
+      console.error('Element #saved-stories-list not found');
+      return;
+    }
+    
     if (!stories.length) {
       list.innerHTML = '<p>Tidak ada story tersimpan.</p>';
       return;
     }
+    
     list.innerHTML = stories.map(story => `
       <div class="story-card" style="display:flex;align-items:center;gap:1rem;margin-bottom:1rem;">
         <img src="${story.photoUrl}" alt="Story" style="max-width:120px;max-height:80px;object-fit:cover;border-radius:8px;">
@@ -34,10 +50,11 @@ export default class SavedStoriesPage {
         </div>
       </div>
     `).join('');
+    
     list.querySelectorAll('.delete-saved').forEach(btn => {
       btn.onclick = async () => {
         await deleteSavedStory(btn.dataset.id);
-        this.showSavedStories();
+        await this.showSavedStories();
       };
     });
   }

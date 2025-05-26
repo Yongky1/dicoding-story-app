@@ -34,12 +34,8 @@ const registerServiceWorker = async () => {
       });
 
       // Handle controller change
-      let refreshing = false;
       navigator.serviceWorker.addEventListener('controllerchange', () => {
-        if (!refreshing) {
-          refreshing = true;
-          window.location.reload();
-        }
+        console.log('Service worker controller changed. New service worker is controlling the page.');
       });
 
       console.log('ServiceWorker registration successful');
