@@ -42,7 +42,7 @@ class HomeView {
             id: 'dummy-1',
             name: 'Offline Story 1',
             description: 'Ini adalah contoh story offline. Silakan online untuk melihat story asli.',
-            photoUrl: '/no-image.png',
+            photoUrl: '',
             createdAt: new Date().toISOString(),
             lat: -6.2,
             lon: 106.8
@@ -51,7 +51,7 @@ class HomeView {
             id: 'dummy-2',
             name: 'Offline Story 2',
             description: 'Cobalah online untuk mendapatkan data story terbaru.',
-            photoUrl: '/no-image.png',
+            photoUrl: '',
             createdAt: new Date().toISOString(),
             lat: -7.2,
             lon: 110.4
@@ -60,7 +60,7 @@ class HomeView {
             id: 'dummy-3',
             name: 'Offline Story 3',
             description: 'Aplikasi tetap bisa diakses walau tanpa internet!',
-            photoUrl: '/no-image.png',
+            photoUrl: '',
             createdAt: new Date().toISOString(),
             lat: -8.6,
             lon: 115.2
@@ -68,8 +68,7 @@ class HomeView {
         ];
         const storiesHTML = dummyStories.map(story => `
           <div class="story-card">
-            <img src="${story.photoUrl}" alt="${story.name}'s story" class="story-image" style="height:120px;" 
-                 onerror="this.src='/no-image.png'">
+            ${story.photoUrl ? `<img src="${story.photoUrl}" alt="${story.name}'s story" class="story-image" style="height:120px;">` : ''}
             <div class="story-content">
               <h3>${story.name}</h3>
               <p>${story.description}</p>
@@ -104,8 +103,7 @@ class HomeView {
     // Render sementara, lalu update tombol simpan setelah cek status
     const storiesHTML = stories.map(story => `
       <div class="story-card">
-        <img src="${story.photoUrl}" alt="${story.name}'s story" class="story-image" style="height:120px;" 
-             onerror="this.src='/no-image.png'">
+        ${story.photoUrl ? `<img src="${story.photoUrl}" alt="${story.name}'s story" class="story-image" style="height:120px;">` : ''}
         <div class="story-content">
           <h3>${story.name}</h3>
           <p>${story.description}</p>

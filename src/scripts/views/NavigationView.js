@@ -13,9 +13,8 @@ class NavigationView {
       <nav class="navbar">
         <div class="navbar-menu">
           ${this.isLoggedIn ? `
-            <button id="notificationButton" class="notification-button navbar-item" aria-label="Notifications">
-              <i class="fas fa-bell"></i>
-              <span class="notification-badge" id="notificationBadge" style="display: none;">0</span>
+            <button id="subscribePushButton" class="notification-button navbar-item" aria-label="Subscribe Notifikasi">
+              <i class="fas fa-bell"></i> Subscribe Notifikasi
             </button>
             <a href="#/" class="navbar-item" id="home-button">
               <i class="fas fa-home"></i> Home

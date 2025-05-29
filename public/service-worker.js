@@ -132,11 +132,11 @@ self.addEventListener('push', (event) => {
     actions: [
       {
         action: 'explore',
-        title: 'View Story',
+        title: 'Lihat Story',
       },
       {
         action: 'close',
-        title: 'Close',
+        title: 'Tutup',
       },
     ]
   };

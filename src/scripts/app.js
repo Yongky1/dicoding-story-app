@@ -41,6 +41,60 @@ class App {
     // Initialize notification manager
     setTimeout(() => {
       this.notificationManager.init();
+      // Tambahkan event listener untuk tombol subscribe push notification
+      const subscribeBtn = document.getElementById('subscribePushButton');
+      if (subscribeBtn) {
+        subscribeBtn.addEventListener('click', async () => {
+          const { subscribePushNotification, unsubscribePushNotification } = await import('./utils/pushNotification');
+          // Jika sudah subscribe, lakukan unsubscribe
+          if (subscribeBtn.dataset.subscribed === 'true') {
+            try {
+              await unsubscribePushNotification();
+              subscribeBtn.innerHTML = '<i class="fas fa-bell"></i> Subscribe Notifikasi';
+              subscribeBtn.dataset.subscribed = 'false';
+              alert('Berhasil unsubscribe push notification!\n\nCatatan: Untuk mengatur ulang izin notifikasi, silakan ubah pengaturan notifikasi di browser Anda (klik ikon gembok di address bar > Notifikasi > Izinkan/Tolak).');
+            } catch (err) {
+              alert('Gagal unsubscribe push notification: ' + err.message);
+            }
+            return;
+          }
+          // Selalu minta permission
+          let permission = Notification.permission;
+          if (permission !== 'granted') {
+            permission = await Notification.requestPermission();
+          }
+          if (permission === 'denied') {
+            alert('Izin notifikasi ditolak. Silakan aktifkan izin notifikasi di pengaturan browser Anda (klik ikon gembok di address bar > Notifikasi > Izinkan).');
+            return;
+          }
+          if (permission === 'granted') {
+            try {
+              await subscribePushNotification();
+              subscribeBtn.innerHTML = '<i class="fas fa-bell-slash"></i> Unsubscribe Notifikasi';
+              subscribeBtn.dataset.subscribed = 'true';
+              new Notification('Berhasil Subscribe!', {
+                body: 'Kamu sudah berhasil subscribe notifikasi.',
+                icon: '/icons/icon-192x192.png'
+              });
+              alert('Berhasil subscribe push notification!');
+            } catch (err) {
+              alert('Gagal subscribe push notification: ' + err.message);
+            }
+          }
+        });
+        // Cek status awal, jika sudah subscribe, ubah tombol
+        (async () => {
+          const registration = await navigator.serviceWorker.ready;
+          const subscription = await registration.pushManager.getSubscription();
+          if (subscription) {
+            subscribeBtn.innerHTML = '<i class="fas fa-bell-slash"></i> Unsubscribe Notifikasi';
+            subscribeBtn.dataset.subscribed = 'true';
+          } else {
+            subscribeBtn.innerHTML = '<i class="fas fa-bell"></i> Subscribe Notifikasi';
+            subscribeBtn.dataset.subscribed = 'false';
+          }
+        })();
+      }
     }, 0);
   }
 

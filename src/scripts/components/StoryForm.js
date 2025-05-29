@@ -361,6 +361,13 @@ class StoryForm {
         formData.append('lon', this.selectedLocation.lng);
         
         await this.presenter.addStory(formData);
+        // Tampilkan notifikasi lokal setelah story berhasil di-upload
+        if ('Notification' in window && Notification.permission === 'granted') {
+          new Notification('Story berhasil dibuat', {
+            body: `Anda telah membuat story baru dengan deskripsi: ${description}`,
+            icon: '/icons/icon-192x192.png'
+          });
+        }
         window.location.hash = '/';
       } catch (error) {
         console.error('Error submitting story:', error);

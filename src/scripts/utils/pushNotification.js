@@ -28,53 +28,92 @@ const registerServiceWorker = async () => {
         newWorker.addEventListener('statechange', () => {
           if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
             // New content is available, but don't force refresh
-            console.log('New content is available; please refresh.');
+            console.log('Konten baru tersedia; silakan refresh.');
           }
         });
       });
 
       // Handle controller change
       navigator.serviceWorker.addEventListener('controllerchange', () => {
-        console.log('Service worker controller changed. New service worker is controlling the page.');
+        console.log('Service worker controller berubah. Service worker baru sedang mengontrol halaman.');
       });
 
-      console.log('ServiceWorker registration successful');
+      console.log('Registrasi ServiceWorker berhasil');
       return registration;
     } catch (error) {
-      console.error('ServiceWorker registration failed:', error);
+      console.error('Registrasi ServiceWorker gagal:', error);
       throw error;
     }
   }
-  throw new Error('ServiceWorker not supported');
+  throw new Error('ServiceWorker tidak didukung');
 };
 
-// Fungsi untuk subscribe push notification ke server Dicoding
+// Fungsi untuk memeriksa dan meminta izin notifikasi
+const checkNotificationPermission = async () => {
+  if (!('Notification' in window)) {
+    throw new Error('Browser ini tidak mendukung notifikasi');
+  }
+
+  const permission = await Notification.requestPermission();
+  
+  if (permission === 'denied') {
+    throw new Error('Izin notifikasi ditolak. Silakan aktifkan izin notifikasi di pengaturan browser Anda.');
+  }
+  
+  if (permission === 'default') {
+    throw new Error('Izin notifikasi belum diberikan. Silakan berikan izin notifikasi untuk menggunakan fitur ini.');
+  }
+
+  return permission;
+};
+
+// Fungsi untuk subscribe push notification
 const subscribePushNotification = async (token = localStorage.getItem('token')) => {
-  const registration = await navigator.serviceWorker.ready;
-  const subscription = await registration.pushManager.subscribe({
-    userVisibleOnly: true,
-    applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
-  });
-  const { endpoint, keys } = subscription.toJSON();
-  const response = await fetch('https://story-api.dicoding.dev/v1/notifications/subscribe', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
-    },
-    body: JSON.stringify({ endpoint, keys })
-  });
-  if (!response.ok) throw new Error('Failed to subscribe push notification');
-  return subscription;
+  try {
+    // Periksa izin notifikasi terlebih dahulu
+    await checkNotificationPermission();
+
+    const registration = await navigator.serviceWorker.ready;
+    const subscription = await registration.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
+    });
+    
+    const { endpoint, keys } = subscription.toJSON();
+    const response = await fetch('https://story-api.dicoding.dev/v1/notifications/subscribe', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ endpoint, keys })
+    });
+
+    if (!response.ok) {
+      throw new Error('Gagal berlangganan push notification');
+    }
+
+    const responseData = await response.json();
+    if (responseData.error) {
+      throw new Error(responseData.message);
+    }
+
+    return responseData.data;
+  } catch (error) {
+    if (error.name === 'NotAllowedError') {
+      throw new Error('Izin notifikasi ditolak. Silakan aktifkan izin notifikasi di pengaturan browser Anda.');
+    }
+    throw error;
+  }
 };
 
-// Fungsi untuk unsubscribe push notification dari server Dicoding
+// Fungsi untuk unsubscribe push notification
 const unsubscribePushNotification = async (token = localStorage.getItem('token')) => {
   const registration = await navigator.serviceWorker.ready;
   const subscription = await registration.pushManager.getSubscription();
+  
   if (subscription) {
     const { endpoint } = subscription;
-    // Hapus dari server
     const response = await fetch('https://story-api.dicoding.dev/v1/notifications/subscribe', {
       method: 'DELETE',
       headers: {
@@ -83,20 +122,87 @@ const unsubscribePushNotification = async (token = localStorage.getItem('token')
       },
       body: JSON.stringify({ endpoint })
     });
-    if (!response.ok) throw new Error('Failed to unsubscribe push notification');
+
+    if (!response.ok) {
+      throw new Error('Gagal berhenti berlangganan push notification');
+    }
+
+    const responseData = await response.json();
+    if (responseData.error) {
+      throw new Error(responseData.message);
+    }
+
     await subscription.unsubscribe();
   }
 };
 
-// Inisialisasi service worker saja (tanpa auto subscribe)
+// Fungsi untuk mengirim notifikasi report ke diri sendiri
+const notifyReportToSelf = async (reportId, token = localStorage.getItem('token')) => {
+  const response = await fetch(`https://story-api.dicoding.dev/v1/reports/${reportId}/notify-me`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${token}`
+    }
+  });
+  if (!response.ok) throw new Error('Failed to notify report to self');
+  return response.json();
+};
+
+// Fungsi untuk mengirim notifikasi report ke user tertentu
+const notifyReportToUser = async (reportId, userId, token = localStorage.getItem('token')) => {
+  const response = await fetch(`https://story-api.dicoding.dev/v1/reports/${reportId}/notify-me`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+    body: JSON.stringify({ userId })
+  });
+  if (!response.ok) throw new Error('Failed to notify report to user');
+  return response.json();
+};
+
+// Fungsi untuk mengirim notifikasi report ke semua user
+const notifyReportToAll = async (reportId, token = localStorage.getItem('token')) => {
+  const response = await fetch(`https://story-api.dicoding.dev/v1/reports/${reportId}/notify-all`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${token}`
+    }
+  });
+  if (!response.ok) throw new Error('Failed to notify report to all users');
+  return response.json();
+};
+
+// Fungsi untuk mengirim notifikasi komentar ke pemilik report
+const notifyCommentToReportOwner = async (reportId, commentId, token = localStorage.getItem('token')) => {
+  const response = await fetch(`https://story-api.dicoding.dev/v1/reports/${reportId}/comments/${commentId}/notify`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${token}`
+    }
+  });
+  if (!response.ok) throw new Error('Failed to notify comment to report owner');
+  return response.json();
+};
+
+// Inisialisasi service worker dan auto subscribe jika user sudah login
 const initPushNotification = async () => {
   try {
     await registerServiceWorker();
-    // Tidak auto subscribe di sini, biar manual oleh user
-    console.log('Service worker registered for push notification');
+    // Tidak ada subscribe otomatis di sini!
   } catch (error) {
-    console.error('Failed to initialize push notification:', error);
+    console.error('Gagal menginisialisasi push notification:', error.message);
   }
 };
 
-export { initPushNotification, subscribePushNotification, unsubscribePushNotification }; 
+export { 
+  initPushNotification, 
+  subscribePushNotification, 
+  unsubscribePushNotification,
+  notifyReportToSelf,
+  notifyReportToUser,
+  notifyReportToAll,
+  notifyCommentToReportOwner,
+  checkNotificationPermission
+}; 

@@ -2,33 +2,39 @@ class NotificationManager {
   constructor() {
     this.notifications = [];
     this.unreadCount = 0;
+    this.init();
   }
 
   init() {
-    // Create notification dropdown
-    const dropdown = document.createElement('div');
-    dropdown.className = 'notification-dropdown';
-    dropdown.id = 'notificationDropdown';
-    document.querySelector('.app-bar__navigation').appendChild(dropdown);
+    // Create notification button and dropdown if they don't exist
+    if (!document.getElementById('notificationButton')) {
+      const nav = document.querySelector('.app-bar__navigation ul');
+      if (nav) {
+        const notificationContainer = document.createElement('li');
+        notificationContainer.innerHTML = `
+          <button id="notificationButton" class="notification-button">
+            <i class="fas fa-bell"></i>
+            <span id="notificationBadge" class="notification-badge" style="display: none">0</span>
+          </button>
+          <div id="notificationDropdown" class="notification-dropdown"></div>
+        `;
+        nav.appendChild(notificationContainer);
 
-    // Add click event to notification button
-    const button = document.getElementById('notificationButton');
-    if (!button) return; // Jangan error jika button tidak ada
-    button.addEventListener('click', () => this.toggleDropdown());
+        // Add click event for notification button
+        const button = document.getElementById('notificationButton');
+        const dropdown = document.getElementById('notificationDropdown');
+        
+        button.addEventListener('click', () => {
+          dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+        });
 
-    // Close dropdown when clicking outside
-    document.addEventListener('click', (e) => {
-      if (!button.contains(e.target) && !dropdown.contains(e.target)) {
-        dropdown.classList.remove('show');
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+          if (!button.contains(e.target) && !dropdown.contains(e.target)) {
+            dropdown.style.display = 'none';
+          }
+        });
       }
-    });
-  }
-
-  toggleDropdown() {
-    const dropdown = document.getElementById('notificationDropdown');
-    dropdown.classList.toggle('show');
-    if (dropdown.classList.contains('show')) {
-      this.renderNotifications();
     }
   }
 
@@ -50,16 +56,48 @@ class NotificationManager {
 
   updateBadge() {
     const badge = document.getElementById('notificationBadge');
-    if (this.unreadCount > 0) {
-      badge.textContent = this.unreadCount;
-      badge.style.display = 'block';
-    } else {
-      badge.style.display = 'none';
+    if (badge) {
+      if (this.unreadCount > 0) {
+        badge.textContent = this.unreadCount;
+        badge.style.display = 'block';
+      } else {
+        badge.style.display = 'none';
+      }
     }
+  }
+
+  formatTime(timestamp) {
+    const date = new Date(timestamp);
+    const now = new Date();
+    const diff = now - date;
+
+    // Less than 1 minute
+    if (diff < 60000) {
+      return 'Just now';
+    }
+    // Less than 1 hour
+    if (diff < 3600000) {
+      const minutes = Math.floor(diff / 60000);
+      return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
+    }
+    // Less than 24 hours
+    if (diff < 86400000) {
+      const hours = Math.floor(diff / 3600000);
+      return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+    }
+    // Less than 7 days
+    if (diff < 604800000) {
+      const days = Math.floor(diff / 86400000);
+      return `${days} day${days > 1 ? 's' : ''} ago`;
+    }
+    // Otherwise show date
+    return date.toLocaleDateString();
   }
 
   renderNotifications() {
     const dropdown = document.getElementById('notificationDropdown');
+    if (!dropdown) return;
+
     if (this.notifications.length === 0) {
       dropdown.innerHTML = `
         <div class="notification-empty">
@@ -78,24 +116,6 @@ class NotificationManager {
         <div class="notification-time">${this.formatTime(notification.timestamp)}</div>
       </div>
     `).join('');
-  }
-
-  formatTime(timestamp) {
-    const date = new Date(timestamp);
-    const now = new Date();
-    const diff = now - date;
-
-    if (diff < 60000) { // less than 1 minute
-      return 'Just now';
-    } else if (diff < 3600000) { // less than 1 hour
-      const minutes = Math.floor(diff / 60000);
-      return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
-    } else if (diff < 86400000) { // less than 1 day
-      const hours = Math.floor(diff / 3600000);
-      return `${hours} hour${hours > 1 ? 's' : ''} ago`;
-    } else {
-      return date.toLocaleDateString();
-    }
   }
 }
 

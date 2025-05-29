@@ -40,5 +40,9 @@
       "type": "image/png",
       "label": "Tampilan mobile"
     }
-  ]
+  ],
+  "permissions": [
+    "notifications"
+  ],
+  "gcm_sender_id": "103953800507"
 } 
